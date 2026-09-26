@@ -42,7 +42,7 @@ Keep the app installed and avoid force-stopping it: Android must be able to deli
 | FR / EN | Chooses and remembers the interface language. |
 | Wi-Fi file and help | Explains the workaround, profile storage and limitations. |
 
-Recovery also works when the selected profile is not saved in Android yet. Android networks absent from the app catalog must be added again if you want to use them later. There is no factory reset and no continuous reboot loop. Reconnection has an outer deadline of 150 seconds per profile. If a background worker disappears, its stale marker is cleared on the next status check or action, after a 15-second launch grace period; the app then reports an interrupted operation and allows retrying. This does not automatically start another reboot.
+Recovery also works when the selected profile is not saved in Android yet. Android networks absent from the app catalog must be added again if you want to use them later. There is no factory reset and no continuous reboot loop. After a recovery reboot, automatic reconnection waits 5 seconds, then retries after 10 and 15 seconds when needed; the manual **Connect** action remains immediate and single-shot. Reconnection has an outer deadline of 150 seconds per profile. If a background worker disappears, its stale marker is cleared on the next status check or action, after a 15-second launch grace period; the app then reports an interrupted operation and allows retrying. Neither the retry worker nor stale-marker cleanup starts another reboot.
 
 The manual launchers remain in `Downloads/Thor-Scripts` for **Thor Settings → Run script as root**. The app forgets all Android networks and reconnects one selected profile. The legacy manual script `10_WIFI_OUBLI_REBOOT_AUTO.sh` keeps its narrower behavior: it forgets only profiles listed in the file, then tries those profiles in order.
 
@@ -82,7 +82,7 @@ Version 2.2: all-network recovery was launched from the real app and the boot re
 - Real-device normal connection, and a complete recovery cycle launched through the app, with association and IP address confirmed after boot. The boot receiver performed recovery; no PC reconnect/resume command was issued after reboot.
 - The USB cable remained attached for observation. A physically disconnected cable test was not performed.
 - French/English resource parity, language switching and help checked on the Thor. Screenshots use demo mode, which skips root setup, profile loading and mutations.
-- Isolated tests cover literal passwords, malformed profiles, empty catalogs, exact SSID matching, WPA2/WPA3 selection, cached security across an empty reboot scan, all-network recovery, preservation of the catalog, legacy scoped recovery, failure before reboot, and the stability of pending recovery credentials.
+- Isolated tests cover literal passwords, malformed profiles, empty catalogs, exact SSID matching, WPA2/WPA3 selection, cached security across an empty reboot scan, all-network recovery, preservation of the catalog, legacy scoped recovery, failure before reboot, the 5/10/15-second retry schedule, immediate manual connection, and the stability of pending recovery credentials.
 - APK signing verified; local backup and installed APK hashes compared.
 
 These checks establish the observed connection and IP result, not Internet reachability, every game/device interaction, or a permanent firmware fix.
@@ -110,7 +110,10 @@ The Python shell tests use Git for Windows Bash and do not contact a device:
 python tests/verify_app_api.py
 python tests/verify_workflow.py
 python tests/verify_scripts.py
+python tests/verify_retry_schedule.py
 ```
+
+The retry-schedule test also supports Bash on macOS and Linux.
 
 `tests/NetworkStoreTest.java` runs the Android-independent profile parser tests; `tests/WifiStateTest.java` checks live connection labels, including association without an IP and stale addresses. `tests/UiTestRunner.java` is a separate Android instrumentation test, excluded from the distributed APK. It uses temporary dummy profiles, not real passwords.
 

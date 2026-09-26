@@ -186,11 +186,43 @@ worker|connect)
     if [ "$OP" = connect ]; then load_public || { state CONFIG_FILE_INVALID; exit 1; }; fi
     validate || { state STOP_NO_VALID_PRIVATE_CREDENTIALS; exit 1; }
     if [ "$OP" = connect ]; then printf '%s\n' "$BOOT" > "$P/working"; fi
-    state RECONNECTING
     budget=$((150 * rows / 2))
-    timeout -k 2 "$budget" /system/bin/sh "$BIN/wifi_reconnect.sh" > "$P/last-connect-result" 2>&1
-    rc=$?
-    if [ "$rc" = 0 ]; then state CONNECTED_WITH_IP; else state "RECONNECT_NOT_CONFIRMED_RC=$rc"; fi
+
+    # A manual connection stores the current boot ID in working and stays
+    # immediate. A reboot resume carries the previous boot ID: give Android
+    # and the AYN root/Wi-Fi services time to settle, then retry three times.
+    if [ "$OP" = worker ] && [ "$(cat "$P/working" 2>/dev/null)" != "$BOOT" ]; then
+        delays="5 10 15"
+    else
+        delays="0"
+    fi
+
+    attempt=0
+    rc=1
+    attempt_result="$P/.last-connect-attempt-$$"
+    : > "$P/last-connect-result"
+
+    for delay in $delays; do
+        attempt=$((attempt + 1))
+        state RECONNECTING
+        [ "$delay" = 0 ] || sleep "$delay"
+
+        timeout -k 2 "$budget" /system/bin/sh "$BIN/wifi_reconnect.sh" > "$attempt_result" 2>&1
+        rc=$?
+        {
+            printf '=== ATTEMPT %s / DELAY %ss / RC=%s ===\n' "$attempt" "$delay" "$rc"
+            cat "$attempt_result"
+        } >> "$P/last-connect-result"
+        rm -f "$attempt_result"
+
+        [ "$rc" != 0 ] || break
+    done
+
+    if [ "$rc" = 0 ]; then
+        state CONNECTED_WITH_IP
+    else
+        state "RECONNECT_NOT_CONFIRMED_AFTER_${attempt}_ATTEMPTS_RC=$rc"
+    fi
     exit "$rc";;
 companion-test)
     date -u > "$P/companion-tested"

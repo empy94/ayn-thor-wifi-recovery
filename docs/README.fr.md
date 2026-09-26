@@ -4,7 +4,7 @@ L'application automatise un contournement des pannes Wi-Fi du Thor : oublier tou
 
 [Installer l'APK](../dist/Thor-WiFi-v2.3.apk). Ouvrir Thor Wi-Fi une fois, ajouter ses réseaux, sélectionner un réseau puis choisir l'action. Le bouton **FR / EN** change la langue. **Fichier Wi-Fi et aide** explique l'utilité et les limites.
 
-La suppression d'une entrée de la liste ne supprime pas le réseau Android. Le bouton de récupération oublie **tous les réseaux Android**, après confirmation, puis reconnecte le réseau choisi. La liste de l’application et ses mots de passe sont conservés. Les réseaux absents de cette liste devront être ajoutés à nouveau. La reprise se fait par l'application au démarrage ; déverrouiller le Thor si demandé. Garder l'application installée et ne pas la forcer à l'arrêt.
+La suppression d'une entrée de la liste ne supprime pas le réseau Android. Le bouton de récupération oublie **tous les réseaux Android**, après confirmation, puis reconnecte le réseau choisi. La liste de l’application et ses mots de passe sont conservés. Les réseaux absents de cette liste devront être ajoutés à nouveau. Après le redémarrage, la reprise automatique attend 5 secondes, puis réessaie après 10 et 15 secondes si nécessaire ; la connexion manuelle reste immédiate et n'effectue qu'une tentative. Le worker de reprise ne lance aucun nouveau redémarrage. Déverrouiller le Thor si demandé. Garder l'application installée et ne pas la forcer à l'arrêt.
 
 Les mots de passe sont en clair dans `Téléchargements/Thor-Scripts/WIFI_RESEAUX.txt`, pour permettre une modification locale sans PC. Ils sont masqués dans l'éditeur. Les sources et l'APK ne contiennent aucun identifiant personnel. Ne pas publier son fichier de réseaux ni sa clé privée de signature.
 
