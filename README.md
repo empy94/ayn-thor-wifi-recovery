@@ -23,7 +23,7 @@ Real screenshots of the app's read-only demo mode. The network names are fiction
 
 ## Installation
 
-1. Copy [Thor-WiFi-v2.3.apk](dist/Thor-WiFi-v2.3.apk) to your Thor and install it. Allow installation from your chosen file manager if Android asks.
+1. Copy [Thor-WiFi-v2.4.apk](dist/Thor-WiFi-v2.4.apk) to your Thor and install it. Allow installation from your chosen file manager if Android asks.
 2. Open **Thor Wi-Fi** once. The app uses AYN's existing root service to install its bundled scripts. No separate script download, PC, Shizuku or network access is required after installation.
 3. Add your network name and Wi-Fi password (WPA2 or WPA3), or pick a name from **Saved in Android**. If the app does not already know that password, enter it once.
 4. Select a network and choose **Connect** or **Forget, restart and reconnect**.
@@ -73,6 +73,8 @@ The app reads the file as literal text; it never evaluates it as shell code. Its
 Share the APK or this source repository. **Do not share your profile file, private signing key, or unreviewed device logs.**
 
 ## Verification performed
+
+Version 2.4: reclaim an empty orphaned app-lock after its grace period, only when no other live app API process is present. Fresh locks, live operations, and unexpected lock contents are preserved. Tests cover these cases. Existing all-network recovery behavior is unchanged. On 2026-10-10, the APK was rebuilt, signature-verified and installed over 2.3 on the connected Thor. A real app-triggered forget/reboot cycle reconnected automatically through BootReceiver to the selected network with an IPv4 address. The profile catalog SHA-256 was unchanged and app-lock, pending, working and worker.pid were absent afterward. USB remained attached for observation; no PC resume command or Internet test was used.
 
 Version 2.3: upgrading the actual Thor cleared an orphaned recovery marker whose worker had disappeared. A new all-network recovery started through the app, rebooted the device and reconnected through the boot receiver with global IP addresses. The profile file was unchanged and both pending/working markers were gone. No PC resume command was used. An idle observation confirmed that snapshots no longer repeat automatically. Guard tests cover stale, fresh, live-worker and absent markers.
 
